@@ -1,36 +1,223 @@
-# This is a basic workflow to help you get started with Actions
+name: Icecast
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
-    branches: [ "master" ]
+    branches:
+      - master
+    paths:
+      - "icecast/**"
+      - "!icecast/README.md"
+      - ".github/workflows/icecast.yml"
+
   pull_request:
-    branches: [ "master" ]
+    paths:
+      - "icecast/**"
+      - "!icecast/README.md"
+      - ".github/workflows/icecast.yml"
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+permissions:
+  contents: read
+  packages: write
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  IMAGE_NAME: ghcr.io/acayseth/icecast2
+
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  # ==========================================================
+  # Verify
+  # ==========================================================
+  verify:
+    name: Verify Icecast2
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      sha: ${{ steps.version.outputs.sha }}
+      short_sha: ${{ steps.version.outputs.short_sha }}
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      # --------------------------------------------------------
+      # Checkout
+      # --------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN }}
+          fetch-depth: 1
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      # --------------------------------------------------------
+      # Get version
+      # --------------------------------------------------------
+      - name: Get Icecast version
+        id: version
+        shell: bash
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          set -e
+
+          VERSION=$(tr -d '[:space:]' < icecast/VERSION)
+
+          if [ -z "$VERSION" ]; then
+            echo "ERROR: icecast/VERSION is empty"
+            exit 1
+          fi
+
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "ERROR: Invalid version: ${VERSION}"
+            echo "Expected format: MAJOR.MINOR.PATCH"
+            exit 1
+          fi
+
+          SHA="${GITHUB_SHA}"
+          SHORT_SHA="${GITHUB_SHA::7}"
+
+          echo
+          echo "=========================================="
+          echo "Icecast2"
+          echo "=========================================="
+          echo "Version:    ${VERSION}"
+          echo "Commit:     ${SHA}"
+          echo "Short SHA:  ${SHORT_SHA}"
+          echo "Image:      ${IMAGE_NAME}"
+          echo "Event:      ${GITHUB_EVENT_NAME}"
+          echo "=========================================="
+          echo
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "sha=${SHA}" >> "$GITHUB_OUTPUT"
+          echo "short_sha=${SHORT_SHA}" >> "$GITHUB_OUTPUT"
+
+  # ==========================================================
+  # Build
+  # ==========================================================
+  build:
+    name: Build Icecast2 - Multi-platform
+    needs: verify
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------------------
+      # Checkout
+      # --------------------------------------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.TOKEN }}
+          fetch-depth: 1
+
+      # --------------------------------------------------------
+      # QEMU
+      # --------------------------------------------------------
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # --------------------------------------------------------
+      # Buildx
+      # --------------------------------------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # --------------------------------------------------------
+      # Login to GHCR
+      # Only needed when publishing
+      # --------------------------------------------------------
+      - name: Login to GitHub Container Registry
+        if: github.event_name == 'push'
+        shell: bash
+        run: |
+          echo "${{ secrets.TOKEN }}" | docker login ghcr.io \
+            --username acayseth \
+            --password-stdin
+
+      # --------------------------------------------------------
+      # Build
+      # --------------------------------------------------------
+      - name: Build Icecast2
+        uses: docker/build-push-action@v6
+        with:
+          context: ./icecast
+          file: ./icecast/Dockerfile
+
+          build-args: |
+            ICECAST_VERSION=${{ needs.verify.outputs.version }}
+
+          platforms: |
+            linux/amd64
+            linux/arm64
+
+          push: ${{ github.event_name == 'push' }}
+
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ needs.verify.outputs.version }}
+            ${{ env.IMAGE_NAME }}:sha-${{ needs.verify.outputs.short_sha }}
+
+          labels: |
+            org.opencontainers.image.title=Icecast2
+            org.opencontainers.image.description=Docker image for Icecast2
+            org.opencontainers.image.source=https://github.com/acayseth/onair
+            org.opencontainers.image.documentation=https://github.com/acayseth/onair/tree/master/icecast
+            org.opencontainers.image.version=${{ needs.verify.outputs.version }}
+            org.opencontainers.image.revision=${{ needs.verify.outputs.sha }}
+
+  # ==========================================================
+  # Publish
+  # ==========================================================
+  publish:
+    name: Publish Icecast2
+    if: github.event_name == 'push'
+    needs:
+      - verify
+      - build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # --------------------------------------------------------
+      # Login to GHCR
+      # --------------------------------------------------------
+      - name: Login to GitHub Container Registry
+        shell: bash
+        run: |
+          echo "${{ secrets.TOKEN }}" | docker login ghcr.io \
+            --username acayseth \
+            --password-stdin
+
+      # --------------------------------------------------------
+      # Set up Buildx
+      # --------------------------------------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # --------------------------------------------------------
+      # Publish latest
+      # --------------------------------------------------------
+      - name: Publish latest tag
+        shell: bash
+        run: |
+          docker buildx imagetools create \
+            --tag "${IMAGE_NAME}:latest" \
+            "${IMAGE_NAME}:${{ needs.verify.outputs.version }}"
+
+      # --------------------------------------------------------
+      # Show published images
+      # --------------------------------------------------------
+      - name: Show published images
+        shell: bash
+        run: |
+          echo
+          echo "=========================================="
+          echo "Icecast2 published successfully"
+          echo "=========================================="
+          echo
+          echo "Version:"
+          echo "  ${IMAGE_NAME}:${{ needs.verify.outputs.version }}"
+          echo
+          echo "Commit:"
+          echo "  ${IMAGE_NAME}:sha-${{ needs.verify.outputs.short_sha }}"
+          echo
+          echo "Latest:"
+          echo "  ${IMAGE_NAME}:latest"
+          echo
+          echo "Git commit:"
+          echo "  ${{ needs.verify.outputs.sha }}"
+          echo
+          echo "=========================================="
