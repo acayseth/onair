@@ -14,6 +14,7 @@ RUN echo "deb http://deb.debian.org/debian trixie-backports main" \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         automake \
+        curl \
         build-essential \
         ca-certificates \
         curl \
@@ -78,6 +79,7 @@ RUN echo "deb http://deb.debian.org/debian trixie-backports main" \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
+        curl \
         gettext-base \
         libcurl4t64 \
         libogg0 \
@@ -125,11 +127,13 @@ RUN groupadd \
 
 RUN mkdir -p \
         /etc/icecast \
+        /var/run/icecast \
         /var/log/icecast \
         /var/lib/icecast \
         /var/lib/icecast/web \
     && chown -R icecast:icecast \
         /etc/icecast \
+        /var/run/icecast \
         /var/log/icecast \
         /var/lib/icecast
 

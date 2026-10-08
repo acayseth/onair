@@ -27,9 +27,9 @@ A multi-platform Docker image for [Icecast](https://icecast.org/), built directl
 ## Docker
 
 ```bash
-docker pull ghcr.io/acayseth/icecast2:latest
+docker pull ghcr.io/acayseth/icecast2:{ latest | 2.5.0 }
 
-docker run -d -p 8000:8000 ghcr.io/acayseth/icecast2:latest
+docker run -d -p 8000:8000 ghcr.io/acayseth/icecast2:{ latest | 2.5.0 }
 ```
 
 ## Version

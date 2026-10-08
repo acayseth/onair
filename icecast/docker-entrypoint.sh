@@ -33,7 +33,7 @@ export ICECAST_ADMIN_PASSWORD
 export ICECAST_MAX_CLIENTS
 export ICECAST_MAX_SOURCES
 
-echo "Icecast ${ICECAST_VERSION}"
+echo "Icecast ${ICECAST_VERSION:-unknown}"
 echo "Generating configuration: /etc/icecast/icecast.xml"
 
 # ============================================================
@@ -53,6 +53,12 @@ envsubst \
      ${ICECAST_MAX_SOURCES}' \
     < "/etc/icecast/icecast.xml.source" \
     > "/etc/icecast/icecast.xml"
+
+# ============================================================
+# Configuration permissions
+# ============================================================
+
+chmod 0640 /etc/icecast/icecast.xml
 
 # ============================================================
 # Validate configuration

@@ -43,7 +43,7 @@
         <adminroot>/usr/share/icecast/admin</adminroot>
 
         <logdir>/var/log/icecast</logdir>
-        <pidfile>/var/run/icecast.pid</pidfile>
+        <pidfile>/var/run/icecast/icecast.pid</pidfile>
 
         <alias source="/" destination="/status.xsl" />
     </paths>
