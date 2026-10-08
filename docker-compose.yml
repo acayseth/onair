@@ -1,0 +1,45 @@
+networks:
+  onair:
+    driver: bridge
+
+services:
+
+  liquidsoap:
+    build:
+      context: liquidsoap
+      dockerfile: Dockerfile
+      args:
+        LIQUIDSOAP_VERSION: 2.4.5
+    image: acayseth/liquidsoap:local
+    environment:
+      ICECAST_HOST: icecast
+      ICECAST_PORT: "8000"
+      ICECAST_PASSWORD: "pwd"
+    volumes:
+      - ./storage:/app/storage
+    networks:
+      - onair
+    depends_on:
+      icecast:
+        condition: service_healthy
+
+  icecast:
+    build:
+      context: icecast
+      dockerfile: Dockerfile
+      args:
+        ICECAST_VERSION: 2.5.0
+    image: acayseth/icecast2:local
+    environment:
+      ICECAST_SOURCE_PASSWORD: "pwd"
+      ICECAST_ADMIN_PASSWORD: "admin-password"
+    ports:
+      - "8000:8000"
+    networks:
+      - onair
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
