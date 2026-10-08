@@ -272,7 +272,7 @@ Example:
 
 ```text
 ghcr.io/acayseth/icecast2:2.5.0
-ghcr.io/acayseth/liquidsoap:2.5.4
+ghcr.io/acayseth/liquidsoap:2.4.5
 ```
 
 Commit-specific images are also published using the Git SHA.
