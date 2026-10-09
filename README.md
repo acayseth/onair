@@ -179,6 +179,38 @@ Cover URL
 Icecast metadata
 ```
 
+### Web UI (Next.js)
+
+The Web UI is the frontend of the OnAir radio stack, built with Next.js.
+
+It provides the user interface for listening to the radio stream and displaying the currently playing track, metadata, and cover art.
+
+It is responsible for:
+
+- Rendering the radio player.
+- Playing the Icecast audio stream in the browser.
+- Displaying the current track title and artist.
+- Displaying album cover art when available.
+- Providing playback controls.
+
+The Web UI connects to the Icecast stream to play audio and retrieve stream metadata.
+
+````text
+Listener's Browser
+       │
+       ▼
+   Next.js Web UI
+       │
+       ├── Audio playback
+       ├── Track metadata
+       ├── Cover art
+       └── Playback controls
+       │
+       ▼
+   Icecast :8000
+
+The Web UI is maintained as part of the OnAir project and follows the upstream Next.js versioning and compatibility policy.
+
 ## Environment
 
 Example Liquidsoap configuration:
@@ -198,7 +230,7 @@ environment:
 
   JINGLE_EVERY: "4"
   STREAM_BITRATE: "128"
-```
+````
 
 S3 can be enabled with:
 
