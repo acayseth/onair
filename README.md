@@ -30,6 +30,18 @@ flowchart TD
     LS -->|Cover / metadata lookup| DISCOGS
 ```
 
+## Versioning Policy
+
+OnAir follows the upstream versioning of the software it integrates and distributes, including Icecast, Liquidsoap, and Next.js.
+
+We do not maintain independent versions of these upstream projects. Instead, we adapt and maintain the OnAir integration code to remain compatible with the upstream versions we support.
+
+When an upstream project releases a new version, we evaluate the changes, update the relevant OnAir code, and publish updated Docker images when compatibility has been verified.
+
+Docker image version tags identify the corresponding upstream software version, while OnAir-specific changes are maintained in this repository.
+
+Upstream releases do not automatically imply an immediate OnAir release. Each update may require code changes, compatibility adjustments, and testing before publication.
+
 ## Components
 
 ### Liquidsoap
