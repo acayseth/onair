@@ -8,26 +8,29 @@ The project provides a simple setup for running an internet radio station with l
 
 ```mermaid
 flowchart TD
-    USER[Listeners]
+  USER[Listeners]
 
-    subgraph DOCKER[Docker Compose]
-        LS[Liquidsoap<br/>Audio Engine]
-        IC[Icecast 2<br/>Streaming Server]
-        S3GW[S3 Stream Gateway]
-        STORAGE[/app/storage<br/>tracks / jingles/]
-    end
+  subgraph DOCKER[Docker Compose]
+      WEB[Web UI - Next.js]
+      LS[Liquidsoap - Audio Engine]
+      IC[Icecast 2 - Streaming Server]
+      S3GW[S3 Stream Gateway]
+      STORAGE[/app/storage<br/>tracks / jingles/]
+  end
 
-    S3[(S3 Storage)]
-    DISCOGS[Discogs API]
+  S3[(S3 Storage)]
+  DISCOGS[Discogs API]
 
-    STORAGE --> LS
-    S3 --> S3GW
-    S3GW --> LS
+  STORAGE --> LS
+  S3 --> S3GW
+  S3GW --> LS
 
-    LS -->|MP3 stream + metadata| IC
-    IC -->|HTTP stream :8000| USER
+  LS -->|MP3 stream + metadata| IC
+  IC -->|HTTP audio stream| WEB
+  IC -->|HTTP stream| USER
+  USER -->|Browser| WEB
 
-    LS -->|Cover / metadata lookup| DISCOGS
+  LS -->|Cover / metadata lookup| DISCOGS
 ```
 
 ## Versioning Policy
