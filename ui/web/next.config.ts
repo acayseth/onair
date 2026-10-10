@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const uid = new Date().getTime();
+const uid = new Date();
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -15,8 +15,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  generateBuildId: () => `build@${uid}`,
-  deploymentId: `deploy@${uid}`,
+  generateBuildId: () => `build@${uid.getTime()}`,
+  deploymentId: `deploy@${uid.getTime()}`,
   output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,

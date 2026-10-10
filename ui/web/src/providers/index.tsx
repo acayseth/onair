@@ -1,7 +1,7 @@
 "use client";
 
-import { type FC, type ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
+import type { FC, ReactNode } from "react";
 
 export const Providers: FC<{ children: ReactNode }> = ({ children }) => {
   return (

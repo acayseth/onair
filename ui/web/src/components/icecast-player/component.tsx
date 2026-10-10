@@ -1,10 +1,10 @@
 "use client";
 
+import { Button, Card } from "@heroui/react";
 import type { FC } from "react";
-import { Card, Button } from "@heroui/react";
 import { CoverComponent } from "@/components/icecast-player/cover.component";
-import { PauseIcon, PlayIcon } from "@/components/icecast-player/icon";
 import { useIcecastPlayerHook } from "@/components/icecast-player/icecast-player.hook";
+import { PauseIcon, PlayIcon } from "@/components/icecast-player/icon";
 
 export const IcecastPlayerComponent: FC<{ streamUrl: string }> = ({
   streamUrl,
@@ -25,6 +25,7 @@ export const IcecastPlayerComponent: FC<{ streamUrl: string }> = ({
         <Card.Title className="font-bold text-md">
           {metadata.StreamTitle}
         </Card.Title>
+        {error && <Card.Description>{error}</Card.Description>}
       </Card.Header>
       <Card.Footer className="flex justify-center items-center">
         <Button isIconOnly size="lg" onClick={toggle} isDisabled={isLoading}>

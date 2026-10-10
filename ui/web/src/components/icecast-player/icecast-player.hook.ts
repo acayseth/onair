@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   createIcecastPlayer,
-  type IcyMetadata,
   type IcecastPlayerInstance,
+  type IcyMetadata,
 } from "@/lib/icecast.lib";
 
 const DEFAULT_URL = "https://stream.radioparadise.com/rock-32";

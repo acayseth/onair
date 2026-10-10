@@ -1,6 +1,6 @@
 import IcecastMetadataPlayer, {
-  type IcyMetadata,
   type IcecastMetadataPlayerIcyOptionsWithCallbacks,
+  type IcyMetadata,
 } from "icecast-metadata-player";
 
 export type { IcyMetadata };
