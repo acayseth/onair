@@ -15,8 +15,8 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  generateBuildId: () => `build@${uid.getTime()}`,
-  deploymentId: `deploy@${uid.getTime()}`,
+  generateBuildId: () => `build-${uid.getTime()}`,
+  deploymentId: `deploy-${uid.getTime()}`,
   output: "standalone",
   cacheComponents: true,
   partialPrefetching: true,
