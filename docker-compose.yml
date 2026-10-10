@@ -43,3 +43,18 @@ services:
       timeout: 3s
       retries: 10
       start_period: 10s
+
+  web:
+    build:
+      context: ui/web
+      dockerfile: Dockerfile
+    image: acayseth/web:local
+    environment:
+      NEXT_PUBLIC_STREAM_URL: "http://localhost:8000/radio.mp3"
+    ports:
+      - "3000:3000"
+    networks:
+      - onair
+    depends_on:
+      icecast:
+        condition: service_healthy
