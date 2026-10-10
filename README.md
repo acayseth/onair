@@ -1,5 +1,7 @@
 # OnAir
 
+<p align="center"> <a href="https://github.com/acayseth/onair/actions/workflows/icecast.yml"><img src="https://github.com/acayseth/onair/actions/workflows/icecast.yml/badge.svg?branch=master" alt="Icecast"></a> <a href="https://github.com/acayseth/onair/actions/workflows/liquidsoap.yml"><img src="https://github.com/acayseth/onair/actions/workflows/liquidsoap.yml/badge.svg?branch=master" alt="Liquidsoap"></a> <a href="https://github.com/acayseth/onair/actions/workflows/web.yml"><img src="https://github.com/acayseth/onair/actions/workflows/web.yml/badge.svg?branch=master" alt="Web Player"></a> </p>
+
 Docker-based internet radio stack built around **Liquidsoap** and **Icecast**.
 
 The project provides a simple setup for running an internet radio station with local audio files or S3-based streaming.
